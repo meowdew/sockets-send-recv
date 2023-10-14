@@ -50,10 +50,12 @@ def recv_file(socket):
         message = client_socket.recv(max_size).decode()
         if message == 'OK':
             with open(filename, 'wb') as f:
-                while True:
+                processing = True
+                while processing:
                     data = socket.recv(max_size)
-                    if not data or data == b'EOF_MARKER':
-                        break
+                    if b'EOF_MARKER' in data:
+                        data, _ = data.split(b'EOF_MARKER', 1)
+                        processing = False
                     print(f'Received {len(data)} bytes of file data')
                     f.write(data)
                 f.flush()
